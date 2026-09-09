@@ -1,0 +1,27 @@
+{
+  "name": "ai-interview-system-node",
+  "version": "1.0.0",
+  "description": "Express + MongoDB backend for AI Interview System",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/scripts/seedJobRoles.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.4",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5",
+    "@anthropic-ai/sdk": "^0.124.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

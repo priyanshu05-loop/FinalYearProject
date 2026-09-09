@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: ai_interview_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ai_network
+
+  node-backend:
+    build:
+      context: ./backend-node
+      dockerfile: Dockerfile
+    container_name: ai_interview_node_backend
+    command: npm start
+    environment:
+      PORT: 5000
+      MONGODB_URI: mongodb://mongodb:27017/ai_interview_db
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-key}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY}
+      CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-3-sonnet-20240229}
+      CLIENT_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - ai_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai_interview_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:5000/api
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - /app/node_modules
+    networks:
+      - ai_network
+
+volumes:
+  mongo_data:
+
+networks:
+  ai_network:
+    driver: bridge
