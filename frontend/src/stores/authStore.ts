@@ -42,16 +42,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
 
-      // Fetch user info
-      const userResponse = await apiClient.getCurrentUser()
+      const userPayload = response.data.user || await apiClient.getCurrentUser().then((res) => res.data)
       set({
-        user: userResponse.data,
+        user: userPayload,
         isAuthenticated: true,
         loading: false,
       })
     } catch (error: any) {
       set({
-        error: error.response?.data?.detail || 'Login failed',
+        error: error.response?.data?.detail || error.response?.data?.message || 'Login failed',
         loading: false,
       })
       throw error
@@ -61,11 +60,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (userData: any) => {
     set({ loading: true, error: null })
     try {
-      await apiClient.register(userData)
+      const payload = {
+        ...userData,
+        firstName: userData.first_name,
+        lastName: userData.last_name,
+      }
+      await apiClient.register(payload)
       set({ loading: false })
     } catch (error: any) {
       set({
-        error: error.response?.data?.detail || 'Registration failed',
+        error: error.response?.data?.detail || error.response?.data?.message || 'Registration failed',
         loading: false,
       })
       throw error

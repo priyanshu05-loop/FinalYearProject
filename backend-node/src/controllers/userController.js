@@ -7,7 +7,19 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res, next) => {
   try {
-    const { email, username, firstName, lastName, password, role } = req.body;
+    const {
+      email,
+      username,
+      firstName,
+      lastName,
+      first_name,
+      last_name,
+      password,
+      role,
+    } = req.body;
+
+    const resolvedFirstName = firstName || first_name || '';
+    const resolvedLastName = lastName || last_name || '';
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
@@ -17,8 +29,8 @@ export const registerUser = async (req, res, next) => {
     const user = await User.create({
       email,
       username,
-      firstName,
-      lastName,
+      firstName: resolvedFirstName,
+      lastName: resolvedLastName,
       password,
       role: role || 'candidate',
     });

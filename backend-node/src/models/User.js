@@ -33,6 +33,19 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
+
+  user.first_name = user.firstName || '';
+  user.last_name = user.lastName || '';
+  user.profile_picture = user.profilePicture || '';
+  user.total_interviews = user.totalInterviews ?? 0;
+  user.average_score = user.averageScore ?? 0;
+
+  delete user.firstName;
+  delete user.lastName;
+  delete user.profilePicture;
+  delete user.totalInterviews;
+  delete user.averageScore;
+
   return user;
 };
 

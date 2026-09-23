@@ -4,18 +4,27 @@ import { apiClient } from '@/services/api'
 import { toast } from 'react-toastify'
 
 interface JobRole {
-  id: number
+  id: string | number
   title: string
   description: string
-  required_skills: string[]
-  experience_level: string
-  difficulty_score: number
+  requiredSkills: string[]
+  experienceLevel: string
+  difficultyScore: number
 }
+
+const normalizeRole = (role: any): JobRole => ({
+  id: role._id || role.id,
+  title: role.title,
+  description: role.description || '',
+  requiredSkills: role.requiredSkills || role.required_skills || [],
+  experienceLevel: role.experienceLevel || role.experience_level || 'mid',
+  difficultyScore: role.difficultyScore ?? role.difficulty_score ?? 5,
+})
 
 export default function InterviewSetupPage() {
   const navigate = useNavigate()
   const [jobRoles, setJobRoles] = useState<JobRole[]>([])
-  const [selectedRole, setSelectedRole] = useState<number | null>(null)
+  const [selectedRole, setSelectedRole] = useState<string | number | null>(null)
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
 
@@ -27,9 +36,11 @@ export default function InterviewSetupPage() {
     try {
       setLoading(true)
       const response = await apiClient.client.get('/interviews/job-roles/')
-      setJobRoles(response.data.results || response.data)
+      const payload = response.data?.results || response.data || []
+      const roles = Array.isArray(payload) ? payload.map(normalizeRole) : []
+      setJobRoles(roles)
     } catch (error) {
-      console.error('Failed to fetch job roles')
+      console.error('Failed to fetch job roles', error)
       toast.error('Failed to load job roles')
     } finally {
       setLoading(false)
@@ -103,9 +114,9 @@ export default function InterviewSetupPage() {
                 {/* Experience Level */}
                 <div className="mb-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                    {role.experience_level === 'entry' && 'Entry Level'}
-                    {role.experience_level === 'mid' && 'Mid Level'}
-                    {role.experience_level === 'senior' && 'Senior Level'}
+                    {role.experienceLevel === 'entry' && 'Entry Level'}
+                    {role.experienceLevel === 'mid' && 'Mid Level'}
+                    {role.experienceLevel === 'senior' && 'Senior Level'}
                   </span>
                 </div>
 
@@ -114,23 +125,23 @@ export default function InterviewSetupPage() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-700">Difficulty</span>
                     <span className="text-xs font-medium text-gray-700">
-                      {role.difficulty_score.toFixed(1)}/10
+                      {role.difficultyScore.toFixed(1)}/10
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-primary-600 h-2 rounded-full"
-                      style={{ width: `${(role.difficulty_score / 10) * 100}%` }}
+                      style={{ width: `${(role.difficultyScore / 10) * 100}%` }}
                     ></div>
                   </div>
                 </div>
 
                 {/* Required Skills */}
-                {role.required_skills && role.required_skills.length > 0 && (
+                {role.requiredSkills && role.requiredSkills.length > 0 && (
                   <div>
                     <h4 className="text-xs font-medium text-gray-700 mb-2">Required Skills</h4>
                     <div className="flex flex-wrap gap-1">
-                      {role.required_skills.slice(0, 3).map((skill, idx) => (
+                      {role.requiredSkills.slice(0, 3).map((skill, idx) => (
                         <span
                           key={idx}
                           className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700"
@@ -138,9 +149,9 @@ export default function InterviewSetupPage() {
                           {skill}
                         </span>
                       ))}
-                      {role.required_skills.length > 3 && (
+                      {role.requiredSkills.length > 3 && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-                          +{role.required_skills.length - 3}
+                          +{role.requiredSkills.length - 3}
                         </span>
                       )}
                     </div>

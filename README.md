@@ -12,8 +12,8 @@ Get started in 5 minutes: [QUICK_START.md](QUICK_START.md)
 |------|---------|--------|
 | **Week 1** | Backend API, React Frontend, JWT Auth | ✅ Complete |
 | **Week 2** | Resume Upload, Skill Extraction, Interview Setup | ✅ Complete |
-| **Week 3** | Video Recording, Speech-to-Text | ⏳ In Progress |
-| **Week 4** | Speech Analysis, Facial Expression Analysis | ⏳ Planned |
+| **Week 3** | AI Resume Interview Generator | ✅ Complete |
+| **Week 4** | Interview Flow Refinement & Candidate Practice | ✅ Complete |
 | **Week 5** | Results Dashboard, Report Generation | ⏳ Planned |
 | **Week 6** | Production Deployment, Performance Optimization | ⏳ Planned |
 

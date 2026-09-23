@@ -16,8 +16,10 @@ export default function ResumeUploadPage() {
     try {
       setLoading(true)
       const response = await apiClient.getResume()
-      if (response.data && response.data.length > 0) {
-        setResume(response.data[0])
+      const resumeData = response.data?.resume || response.data
+      const normalizedResume = Array.isArray(resumeData) ? resumeData[0] : resumeData
+      if (normalizedResume) {
+        setResume(normalizedResume)
       }
     } catch (error) {
       console.log('No resume found')
@@ -33,14 +35,12 @@ export default function ResumeUploadPage() {
 
     try {
       setLoading(true)
-      const formData = new FormData()
-      formData.append('file', file)
-
       const response = await apiClient.uploadResume(file)
-      setResume(response.data.data)
+      const uploadedResume = response.data?.resume || response.data?.data || response.data
+      setResume(uploadedResume)
       toast.success('Resume uploaded successfully! Processing...')
     } catch (error: any) {
-      const errorMsg = error.response?.data?.error || 'Failed to upload resume'
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to upload resume'
       toast.error(errorMsg)
     } finally {
       setLoading(false)
@@ -118,23 +118,23 @@ export default function ResumeUploadPage() {
               <h3 className="text-sm font-medium text-gray-700 mb-2">File Details</h3>
               <div className="bg-gray-50 rounded p-4">
                 <p className="text-sm text-gray-600">
-                  <strong>Name:</strong> {resume.file_name}
+                  <strong>Name:</strong> {resume.fileName || resume.file_name || 'Resume PDF'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Size:</strong> {(resume.file_size / 1024).toFixed(2)} KB
+                  <strong>Size:</strong> {((resume.fileSize || resume.file_size || 0) / 1024).toFixed(2)} KB
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Parsed:</strong> {new Date(resume.parsed_at).toLocaleDateString()}
+                  <strong>Parsed:</strong> {new Date(resume.parsedAt || resume.parsed_at || Date.now()).toLocaleDateString()}
                 </p>
               </div>
             </div>
 
             {/* Skills */}
-            {resume.extracted_skills && resume.extracted_skills.length > 0 && (
+            {(resume.extractedSkills || resume.extracted_skills || []).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Technical Skills</h3>
                 <div className="flex flex-wrap gap-2">
-                  {resume.extracted_skills.slice(0, 10).map((skill, idx) => (
+                  {(resume.extractedSkills || resume.extracted_skills).slice(0, 10).map((skill: string, idx: number) => (
                     <span
                       key={idx}
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800"
@@ -147,16 +147,16 @@ export default function ResumeUploadPage() {
             )}
 
             {/* Experience */}
-            {resume.extracted_experience && (
+            {(resume.extractedExperience || resume.extracted_experience) && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Experience</h3>
                 <div className="bg-gray-50 rounded p-4">
                   <p className="text-sm text-gray-600">
-                    <strong>Years:</strong> {resume.extracted_experience.years || 'Not specified'}
+                    <strong>Years:</strong> {(resume.extractedExperience || resume.extracted_experience)?.years || 'Not specified'}
                   </p>
-                  {resume.extracted_experience.titles && (
+                  {((resume.extractedExperience || resume.extracted_experience)?.titles || []).length > 0 && (
                     <p className="text-sm text-gray-600 mt-2">
-                      <strong>Titles:</strong> {resume.extracted_experience.titles.join(', ')}
+                      <strong>Titles:</strong> {((resume.extractedExperience || resume.extracted_experience).titles || []).join(', ')}
                     </p>
                   )}
                 </div>
@@ -164,11 +164,11 @@ export default function ResumeUploadPage() {
             )}
 
             {/* Education */}
-            {resume.extracted_education && resume.extracted_education.length > 0 && (
+            {(resume.extractedEducation || resume.extracted_education || []).length > 0 && (
               <div>
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Education</h3>
                 <ul className="space-y-1">
-                  {resume.extracted_education.slice(0, 3).map((edu, idx) => (
+                  {(resume.extractedEducation || resume.extracted_education).slice(0, 3).map((edu: string, idx: number) => (
                     <li key={idx} className="text-sm text-gray-600">
                       • {edu}
                     </li>

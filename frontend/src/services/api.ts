@@ -65,6 +65,10 @@ class APIClient {
     return this.client.get('/users/profile/')
   }
 
+  getJobRoles() {
+    return this.client.get('/interviews/job-roles/')
+  }
+
   updateUserProfile(data: any) {
     return this.client.put('/users/profile/', data)
   }
